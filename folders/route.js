@@ -33,14 +33,35 @@ router.get('/', (req, res) => {
 });
 
 router.get('/:id', (req, res) => {
-  Folders.getFolderById(userId)
+  const { id } = req.params;
+  Folders.getFolderById(id)
     .then(folder => res.status(200).json(folder))
     .catch(err => res.status(500).json({ error: err }));
 });
 
 router.get('/user/:userId', (req, res) => {
+  const { userId } = req.params;
   Folders.getFoldersByUserId(userId)
     .then(folder => res.status(200).json(folder))
+    .catch(err => res.status(500).json({ error: err }));
+});
+
+router.put('/:id', (req, res) => {
+  const { id } = req.params;
+  const changes = req.body;
+
+  Folders.updateFolder(id, changes)
+    .then(folder => res.status(200).json(folder))
+    .catch(err => res.status(500).json({ error: err }));
+});
+
+router.delete('/:id', (req, res) => {
+  const { id } = req.params;
+
+  Folders.deleteFolder(id)
+    .then(deleted =>
+      res.status(200).json({ message: `Successfully deleted folder ${id}` })
+    )
     .catch(err => res.status(500).json({ error: err }));
 });
 

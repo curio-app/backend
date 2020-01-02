@@ -27,9 +27,26 @@ const addFolder = async folder => {
   }
 };
 
+const updateFolder = (id, updated) => {
+  return db('folders')
+    .update(updated)
+    .where({ id })
+    .then(updatedFolder => {
+      return getFolderById(id);
+    });
+};
+
+const deleteFolder = id => {
+  return db('folders')
+    .where({ id })
+    .del()
+    .then(result => result);
+};
 module.exports = {
   getAllFolders,
   getFolderById,
   getFoldersByUserId,
   addFolder,
+  updateFolder,
+  deleteFolder,
 };

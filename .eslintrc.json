@@ -14,6 +14,9 @@
   },
   "rules": {
     "arrow-parens": 0,
-    "arrow-body-style": 0
+    "arrow-body-style": 0,
+    "linebreak-style": "off",
+    "no-console": "off",
+    "comma-dangle": "off"
   }
 }

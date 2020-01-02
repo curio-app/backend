@@ -2,6 +2,7 @@ const express = require('express');
 const configureMiddleware = require('./config/middleware.js');
 
 const auth = require('./auth/route.js');
+const collectibles = require('./collectibles/route.js');
 
 const server = express();
 
@@ -14,5 +15,6 @@ server.get('/', (req, res) => {
 });
 
 server.use('/auth', auth);
+server.use('/collectibles', collectibles);
 
 module.exports = server;

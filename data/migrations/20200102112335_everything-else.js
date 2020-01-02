@@ -5,6 +5,14 @@ exports.up = function(knex) {
       table.string('name', 128).notNullable();
       table.dateTime('createdAt').defaultTo(knex.fn.now());
       table.dateTime('updatedAt').defaultTo(knex.fn.now());
+      table
+        .integer('userId')
+        .unsigned()
+        .notNullable()
+        .references('id')
+        .inTable('users')
+        .onDelete('CASCADE')
+        .onUpdate('CASCADE');
     })
     .createTable('collectibles', table => {
       table.increments();
@@ -82,9 +90,9 @@ exports.up = function(knex) {
 exports.down = function(knex) {
   return knex.schema
     .dropTableIfExists('collectiblesTags')
-    .dropTableIfExists('tags')
-    .dropTableIfExists('likes')
     .dropTableIfExists('foldersCollectibles')
+    .dropTableIfExists('folders')
+    .dropTableIfExists('likes')
     .dropTableIfExists('collectibles')
-    .dropTableIfExists('folders');
+    .dropTableIfExists('tags');
 };

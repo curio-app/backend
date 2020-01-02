@@ -90,9 +90,9 @@ exports.up = function(knex) {
 exports.down = function(knex) {
   return knex.schema
     .dropTableIfExists('collectiblesTags')
-    .dropTableIfExists('tags')
-    .dropTableIfExists('likes')
     .dropTableIfExists('foldersCollectibles')
+    .dropTableIfExists('folders')
+    .dropTableIfExists('likes')
     .dropTableIfExists('collectibles')
-    .dropTableIfExists('folders');
+    .dropTableIfExists('tags');
 };

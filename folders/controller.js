@@ -66,6 +66,12 @@ const removeCollectibleFromFolder = (collectible_Id, folder_Id) => {
     .then(result => getCollectiblesInFolder(folder_Id));
 };
 
+const getFolderByNameAndUserId = (name, userId) => {
+  return db('folders')
+    .where({ userId, name })
+    .first();
+};
+
 module.exports = {
   getAllFolders,
   getFolderById,
@@ -76,4 +82,5 @@ module.exports = {
   addCollectibleToFolder,
   getCollectiblesInFolder,
   removeCollectibleFromFolder,
+  getFolderByNameAndUserId,
 };

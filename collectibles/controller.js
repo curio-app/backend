@@ -45,11 +45,17 @@ const getCollectibleById = id => {
     .first();
 };
 
-const addCollectible = async collectible => {
+const addCollectible = async (collectible, folderId) => {
   try {
     const [id] = await db('collectibles')
       .returning('id')
       .insert(collectible);
+    await db('foldersCollectibles')
+      .returning('id')
+      .insert({
+        folderId,
+        collectibleId: id,
+      });
     return getCollectibleById(id);
   } catch (err) {
     return { error: err.detail };

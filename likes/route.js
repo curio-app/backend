@@ -47,7 +47,9 @@ router.post('/:collectibleId', async (req, res) => {
 
 router.delete('/:collectibleId', (req, res) => {
   const { collectibleId } = req.params;
-  const userId = req.body.userId;
+  const { userId } = req.body;
+  console.log(userId, '< - UserId');
+  console.log(req.body);
   Likes.removeLike(collectibleId, userId)
     .then(remaining => {
       res.status(200).json({ message: 'Unliked', remaining });

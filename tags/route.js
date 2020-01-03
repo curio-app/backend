@@ -100,47 +100,14 @@ router.post('/', (req, res) => {
     });
 });
 
-// router.post('/:collectibleId', validateCollectibleId, async (req, res) => {
-//   const { collectibleId } = req.params;
-//   const { tagId } = req.body;
-//   let exists = false;
-
-//   const tags = await Tags.getTagsByCollectibleId(collectibleId);
-
-//   tags.forEach(tag => {
-//     if (tag.id === tagId) {
-//       exists = true;
-//     }
-//   });
-
-//   if (exists) {
-//     return res
-//       .status(400)
-//       .json({ message: 'That tag is already associated to the collectible' });
-//   }
-
-//   Tags.addTagToCollectible(collectibleId, tagId)
-//     .then(added => {
-//       res.status(201).json(added);
-//     })
-//     .catch(error => {
-//       console.log(error);
-//       res.status(500).json({
-//         message: 'Sever error adding tag to collectible',
-//         error,
-//       });
-//     });
-// });
-
 router.post('/:collectibleId', validateCollectibleId, async (req, res) => {
   const { collectibleId } = req.params;
   const tagName = req.body.name;
   let exists = false;
-  console.log(tagName);
+
   const tags = await Tags.getTagsByCollectibleId(collectibleId);
   const findTag = await Tags.getTagByName(tagName);
   const newTag = await Tags.addTag({ name: tagName });
-  console.log('newTag', newTag, 'findTag', findTag);
 
   tags.forEach(tag => {
     if (tag.id === findTag.id) {

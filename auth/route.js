@@ -51,7 +51,7 @@ router.post('/login', async (req, res) => {
     return res.status(400).json({ message: 'Password required' });
   }
   try {
-    const user = await Users.getUserByUsername(username);
+    const user = await Users.getUserByUserName(username);
     if (user && bcrypt.compareSync(password, user.password)) {
       const token = generateToken(user);
       res.status(200).json({ message: 'User signed in', token });

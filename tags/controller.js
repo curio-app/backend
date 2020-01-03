@@ -10,9 +10,9 @@ const getTagById = id => {
     .first();
 };
 
-const getTagByName = tagName => {
+const getTagByName = name => {
   return db('tags')
-    .where((name = tagName))
+    .where({ name })
     .first();
 };
 
@@ -53,6 +53,7 @@ const removeTagFromCollectible = (collectible_Id, tag_Id) => {
 module.exports = {
   getTagsByCollectibleId,
   getTags,
+  getTagByName,
   getTagById,
   addTag,
   removeTagFromCollectible,

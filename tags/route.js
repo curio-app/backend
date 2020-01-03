@@ -1,8 +1,29 @@
 const router = require('express').Router();
 
 const Tags = require('./controller.js');
+const Collectibles = require('../collectibles/controller.js');
 
 // middleware
+const validateCollectibleId = (req, res, next) => {
+  let id = req.params.id || req.params.collectibleId;
+
+  console.log(id);
+
+  Collectibles.getCollectibleById(id)
+    .then(collectible => {
+      console.log(collectible);
+      if (collectible) {
+        req.collectible = collectible;
+        next();
+      } else {
+        res.status(400).json({ message: 'Invalid collectibleId' });
+      }
+    })
+    .catch(err => {
+      console.log(err);
+      res.status(500).json({ message: 'Error validating collectible', err });
+    });
+};
 
 // CRUD
 
@@ -15,7 +36,17 @@ router.get('/', (req, res) => {
     });
 });
 
-router.get('/:collectibleId', (req, res) => {
+router.get('/name/:tagName', (req, res) => {
+  const { tagName } = req.params;
+  Tags.getTagByName(tagName)
+    .then(tag => res.status(200).json(tag))
+    .catch(err => {
+      console.log(err);
+      res.status(500).json({ error: err });
+    });
+});
+
+router.get('/:collectibleId', validateCollectibleId, (req, res) => {
   const { collectibleId } = req.params;
   Tags.getTagsByCollectibleId(collectibleId)
     .then(tags => res.status(200).json(tags))
@@ -28,7 +59,7 @@ router.get('/:collectibleId', (req, res) => {
     });
 });
 
-router.delete('/:collectibleId', (req, res) => {
+router.delete('/:collectibleId', validateCollectibleId, (req, res) => {
   const { collectibleId } = req.params;
   const { tagId } = req.body;
   Tags.removeTagFromCollectible(collectibleId, tagId)
@@ -69,7 +100,7 @@ router.post('/', (req, res) => {
     });
 });
 
-router.post('/:collectibleId', async (req, res) => {
+router.post('/:collectibleId', validateCollectibleId, async (req, res) => {
   const { collectibleId } = req.params;
   const { tagId } = req.body;
   let exists = false;

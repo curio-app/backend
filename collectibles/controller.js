@@ -23,11 +23,9 @@ const getAllCollectibles = async () => {
       'collectibles.description',
       'collectibles.sellable',
       'folders.id as folderId',
-      'users.email',
+      'users.username',
       'users.id as userId'
-    )
-    .orderBy('collectibles.createdAt')
-    .limit(20);
+    );
   const full = collectibles.map(async coll => {
     const likes = await getLikesByCollectibleId(coll.id);
     const tags = await getTagsByCollectibleId(coll.id);

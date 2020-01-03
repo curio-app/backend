@@ -4,6 +4,7 @@ exports.seed = knex => {
   return knex('users').insert([
     {
       email: 'keveightysev@gmail.com',
+      username: 'keveightysev',
       password: hashSync('password', 8),
       role: 'admin',
       imageUrl:
@@ -11,6 +12,7 @@ exports.seed = knex => {
     },
     {
       email: 'mngmay@gmail.com',
+      username: 'mngmay',
       password: hashSync('password', 8),
       role: 'admin',
       imageUrl:

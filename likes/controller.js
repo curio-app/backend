@@ -14,8 +14,10 @@ const addLike = (collectibleId, userId) => {
 };
 
 const removeLike = (collectibleId, userId) => {
+  console.log(collectibleId, '< - collectibleId');
+  console.lg(userId, '< - userId');
   return db('likes')
-    .where({ collectibleId: collectibleId, userId: userId })
+    .where({ userId, collectibleId })
     .del()
     .then(result => getLikesByCollectibleId(collectibleId));
 };

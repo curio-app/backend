@@ -57,4 +57,17 @@ router.post('/:userId', authenticate, async (req, res) => {
   }
 });
 
+router.get('/:collectibleId', async (req, res) => {
+  try {
+    const collectible = await Collectibles.getCollectibleById(
+      req.params.collectibleId
+    );
+    res.status(200).json(collectible);
+  } catch (error) {
+    res
+      .status(500)
+      .json({ message: 'Server error fetching collectible data', error });
+  }
+});
+
 module.exports = router;

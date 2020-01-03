@@ -2,6 +2,24 @@ const router = require('express').Router();
 
 const Folders = require('./controller.js');
 
+// middleware
+const validateFolderId = (req, res, next) => {
+  let id = req.params.id || req.params.folderId;
+
+  Folders.getFolderById(id)
+    .then(folder => {
+      if (folder) {
+        req.folder = folder;
+        next();
+      } else {
+        res.status(400).json({ message: 'Invalid folderId' });
+      }
+    })
+    .catch(err => res.status(500).json(err));
+};
+
+// CRUD
+
 router.post('/', (req, res) => {
   const { userId, name } = req.body;
 
@@ -32,7 +50,7 @@ router.get('/', (req, res) => {
     .catch(err => res.status(500).json({ error: err }));
 });
 
-router.get('/:id', (req, res) => {
+router.get('/:id', validateFolderId, (req, res) => {
   const { id } = req.params;
   Folders.getFolderById(id)
     .then(folder => res.status(200).json(folder))
@@ -46,7 +64,7 @@ router.get('/user/:userId', (req, res) => {
     .catch(err => res.status(500).json({ error: err }));
 });
 
-router.put('/:id', (req, res) => {
+router.put('/:id', validateFolderId, (req, res) => {
   const { id } = req.params;
   const changes = req.body;
 
@@ -55,7 +73,7 @@ router.put('/:id', (req, res) => {
     .catch(err => res.status(500).json({ error: err }));
 });
 
-router.delete('/:id', (req, res) => {
+router.delete('/:id', validateFolderId, (req, res) => {
   const { id } = req.params;
 
   Folders.deleteFolder(id)
@@ -65,7 +83,7 @@ router.delete('/:id', (req, res) => {
     .catch(err => res.status(500).json({ error: err }));
 });
 
-router.post('/:folderId', (req, res) => {
+router.post('/:folderId', validateFolderId, (req, res) => {
   const { folderId } = req.params;
   const { collectibleId } = req.body;
 
@@ -82,7 +100,7 @@ router.post('/:folderId', (req, res) => {
     });
 });
 
-router.get('/collectibles/:folderId', (req, res) => {
+router.get('/collectibles/:folderId', validateFolderId, (req, res) => {
   const { folderId } = req.params;
 
   Folders.getCollectiblesInFolder(folderId)
@@ -98,7 +116,7 @@ router.get('/collectibles/:folderId', (req, res) => {
     });
 });
 
-router.delete('/collectibles/:folderId', (req, res) => {
+router.delete('/collectibles/:folderId', validateFolderId, (req, res) => {
   const { folderId } = req.params;
   const { collectibleId } = req.body;
 

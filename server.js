@@ -6,6 +6,7 @@ const collectibles = require('./collectibles/route.js');
 const folders = require('./folders/route.js');
 const tags = require('./tags/route.js');
 const profiles = require('./profiles/route.js');
+const likes = require('./likes/route.js');
 
 const server = express();
 
@@ -22,5 +23,6 @@ server.use('/collectibles', collectibles);
 server.use('/folders', folders);
 server.use('/tags', tags);
 server.use('/profiles', profiles);
+server.use('/likes', likes);
 
 module.exports = server;

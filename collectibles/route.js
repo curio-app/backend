@@ -61,6 +61,18 @@ router.post('/:userId', authenticate, async (req, res) => {
   }
 });
 
+router.get('/latest', async (req, res) => {
+  try {
+    const collectibles = await Collectibles.getLatest();
+    res.status(200).json(collectibles);
+  } catch (error) {
+    console.log(error);
+    res
+      .status(500)
+      .json({ message: 'Server error fetching collectibles', error });
+  }
+});
+
 router.get('/:collectibleId', async (req, res) => {
   try {
     const collectible = await Collectibles.getCollectibleById(
@@ -68,6 +80,7 @@ router.get('/:collectibleId', async (req, res) => {
     );
     res.status(200).json(collectible);
   } catch (error) {
+    console.log(error);
     res
       .status(500)
       .json({ message: 'Server error fetching collectible data', error });

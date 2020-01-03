@@ -39,6 +39,44 @@ const getAllCollectibles = async () => {
   return results;
 };
 
+const getLatest = async () => {
+  const collectibles = await db('folders')
+    .where({ 'folders.name': 'All' })
+    .join('users', 'folders.userId', 'users.id')
+    .join('foldersCollectibles', 'folders.id', 'foldersCollectibles.folderId')
+    .join(
+      'collectibles',
+      'foldersCollectibles.collectibleId',
+      'collectibles.id'
+    )
+    .select(
+      'collectibles.id as id',
+      'collectibles.name',
+      'collectibles.createdAt',
+      'collectibles.updatedAt',
+      'collectibles.imageUrl',
+      'collectibles.story',
+      'collectibles.description',
+      'collectibles.sellable',
+      'folders.id as folderId',
+      'users.username',
+      'users.id as userId'
+    )
+    .orderBy('collectibles.createdAt', 'desc')
+    .limit(20);
+  const full = collectibles.map(async coll => {
+    const likes = await getLikesByCollectibleId(coll.id);
+    const tags = await getTagsByCollectibleId(coll.id);
+    return {
+      ...coll,
+      likes,
+      tags,
+    };
+  });
+  const results = await Promise.all(full);
+  return results;
+};
+
 const getCollectibleById = async id => {
   const collectible = await db('collectibles')
     .where({ 'collectibles.id': id })
@@ -55,8 +93,9 @@ const getCollectibleById = async id => {
       'collectibles.description',
       'collectibles.story',
       'collectibles.sellable',
+      'collectibles.imageUrl',
       'users.username',
-      'users.imageUrl',
+      'users.imageUrl as userImageUrl',
       'users.id as userId'
     )
     .first();
@@ -86,4 +125,9 @@ const addCollectible = async (collectible, folderId) => {
   }
 };
 
-module.exports = { getAllCollectibles, getCollectibleById, addCollectible };
+module.exports = {
+  getAllCollectibles,
+  getCollectibleById,
+  addCollectible,
+  getLatest,
+};

@@ -19,7 +19,7 @@ const getFullUserProfile = async username => {
         'collectibles.id'
       )
       .select('collectibles.id', 'collectibles.name', 'collectibles.imageUrl')
-      .orderBy('collectibles.createdAt')
+      .orderBy('collectibles.createdAt', 'desc')
       .limit(5);
     return {
       folderId: folder.id,
@@ -34,6 +34,16 @@ const getFullUserProfile = async username => {
   };
 };
 
+const updateProfile = (username, updated) => {
+  return db('users')
+    .update(updated)
+    .where({ username })
+    .then(updatedUser => {
+      return getFullUserProfile(username);
+    });
+};
+
 module.exports = {
   getFullUserProfile,
+  updateProfile,
 };

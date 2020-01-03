@@ -65,4 +65,54 @@ router.delete('/:id', (req, res) => {
     .catch(err => res.status(500).json({ error: err }));
 });
 
+router.post('/:folderId', (req, res) => {
+  const { folderId } = req.params;
+  const { collectibleId } = req.body;
+
+  Folders.addCollectibleToFolder(collectibleId, folderId)
+    .then(added => {
+      res.status(201).json(added);
+    })
+    .catch(error => {
+      console.log(error);
+      res.status(500).json({
+        message: 'Server error adding collectible to folder',
+        error,
+      });
+    });
+});
+
+router.get('/collectibles/:folderId', (req, res) => {
+  const { folderId } = req.params;
+
+  Folders.getCollectiblesInFolder(folderId)
+    .then(collectibles => {
+      res.status(200).json(collectibles);
+    })
+    .catch(error => {
+      console.log(error);
+      res.status(500).json({
+        message: 'Server error getting collectibles from folder',
+        error,
+      });
+    });
+});
+
+router.delete('/:folderId', (req, res) => {
+  const { folderId } = req.params;
+  const { collectibleId } = req.body;
+
+  Folders.removeCollectibleFromFolder(collectibleId, folderId)
+    .then(removed => {
+      res.status(200).json(removed);
+    })
+    .catch(error => {
+      console.log(error);
+      res.status(500).json({
+        message: 'Server error removing collectible from folder',
+        error,
+      });
+    });
+});
+
 module.exports = router;

@@ -39,17 +39,47 @@ const getAllCollectibles = async () => {
   return results;
 };
 
-const getCollectibleById = id => {
-  return db('collectibles')
-    .where({ id })
+const getCollectibleById = async id => {
+  const collectible = await db('collectibles')
+    .where({ 'collectibles.id': id })
+    .join(
+      'foldersCollectibles',
+      'collectibles.id',
+      'foldersCollectibles.collectibleId'
+    )
+    .join('folders', 'foldersCollectibles.folderId', 'folders.id')
+    .join('users', 'folders.userId', 'users.id')
+    .select(
+      'collectibles.id',
+      'collectibles.name',
+      'collectibles.description',
+      'collectibles.story',
+      'collectibles.sellable',
+      'users.username',
+      'users.imageUrl',
+      'users.id as userId'
+    )
     .first();
+  const likes = await getLikesByCollectibleId(collectible.id);
+  const tags = await getTagsByCollectibleId(collectible.id);
+  return {
+    ...collectible,
+    likes,
+    tags,
+  };
 };
 
-const addCollectible = async collectible => {
+const addCollectible = async (collectible, folderId) => {
   try {
     const [id] = await db('collectibles')
       .returning('id')
       .insert(collectible);
+    await db('foldersCollectibles')
+      .returning('id')
+      .insert({
+        folderId,
+        collectibleId: id,
+      });
     return getCollectibleById(id);
   } catch (err) {
     return { error: err.detail };

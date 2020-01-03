@@ -2,6 +2,8 @@ const router = require('express').Router();
 
 const Tags = require('./controller.js');
 
+// middleware
+
 // CRUD
 
 router.get('/', (req, res) => {
@@ -67,10 +69,24 @@ router.post('/', (req, res) => {
     });
 });
 
-router.post('/:collectibleId', (req, res) => {
+router.post('/:collectibleId', async (req, res) => {
   const { collectibleId } = req.params;
   const { tagId } = req.body;
-  console.log(collectibleId, tagId);
+  let exists = false;
+
+  const tags = await Tags.getTagsByCollectibleId(collectibleId);
+
+  tags.forEach(tag => {
+    if (tag.id === tagId) {
+      exists = true;
+    }
+  });
+
+  if (exists) {
+    return res
+      .status(400)
+      .json({ message: 'That tag is already associated to the collectible' });
+  }
 
   Tags.addTagToCollectible(collectibleId, tagId)
     .then(added => {

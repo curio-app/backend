@@ -10,6 +10,12 @@ const getTagById = id => {
     .first();
 };
 
+const getTagByName = tagName => {
+  return db('tags')
+    .where((name = tagName))
+    .first();
+};
+
 const addTag = async tag => {
   try {
     const [id] = await db('tags')

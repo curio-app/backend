@@ -7,4 +7,8 @@ const getTagsByCollectibleId = id => {
     .select('tags.id', 'tags.name');
 };
 
-module.exports = { getTagsByCollectibleId };
+const getTags = () => {
+  return db('tags');
+};
+
+module.exports = { getTagsByCollectibleId, getTags };

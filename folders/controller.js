@@ -11,9 +11,7 @@ const getFolderById = id => {
 };
 
 const getFoldersByUserId = userId => {
-  return db('folders')
-    .where({ userId })
-    .first();
+  return db('folders').where({ userId });
 };
 
 const addFolder = async folder => {
@@ -65,7 +63,7 @@ const removeCollectibleFromFolder = (collectible_Id, folder_Id) => {
   return db('foldersCollectibles')
     .where({ collectibleId: collectible_Id }, { folderId: folder_Id })
     .del()
-    .then(result => result);
+    .then(result => getCollectiblesInFolder(folder_Id));
 };
 
 module.exports = {

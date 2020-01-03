@@ -110,8 +110,6 @@ router.post('/:collectibleId', validateCollectibleId, async (req, res) => {
     const findTag = await Tags.getTagByName(tagName);
     const newTag = await Tags.addTag({ name: tagName });
 
-    console.log(tags);
-
     if (findTag) {
       tags.forEach(tag => {
         if (findTag.id) {
@@ -133,7 +131,6 @@ router.post('/:collectibleId', validateCollectibleId, async (req, res) => {
       newTag.id || findTag.id
     );
 
-    console.log(tags);
     res.status(201).json(added);
   } catch (error) {
     console.log(error);

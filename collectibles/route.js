@@ -1,6 +1,8 @@
 const router = require('express').Router();
 
+const { authenticate } = require('../auth/utils.js');
 const Collectibles = require('./controller.js');
+const Folders = require('../folders/controller.js');
 
 router.get('/', async (req, res) => {
   try {
@@ -14,18 +16,58 @@ router.get('/', async (req, res) => {
   }
 });
 
-router.post('/', async (req, res) => {
-  const collectible = req.body;
-  console.log(collectible);
+router.post('/:userId', authenticate, async (req, res) => {
+  if (req.userId.toString() === req.params.userId) {
+    const { name, description, story, imageUrl, sellable } = req.body;
+    if (!name) {
+      return res
+        .status(400)
+        .json({ message: 'Please include a name for the collectible' });
+    }
+    if (!description) {
+      return res
+        .status(400)
+        .json({ message: 'Please include a description for the collectible' });
+    }
 
-  Collectibles.addCollectible(collectible)
-    .then(newCollectible => res.status(201).json(newCollectible))
-    .catch(error => {
+    try {
+      const allFolder = await Folders.getFolderByNameAndUserId(
+        'All',
+        req.userId
+      );
+      const collectible = await Collectibles.addCollectible(
+        {
+          name,
+          description,
+          story,
+          imageUrl,
+          sellable,
+        },
+        allFolder.id
+      );
+      return res.status(201).json(collectible);
+    } catch (error) {
       console.log(error);
-      res
+      return res
         .status(500)
         .json({ message: 'Server error creating new collectible', error });
-    });
+    }
+  } else {
+    return res.status(401).json({ message: 'Unauthorized, yo.' });
+  }
+});
+
+router.get('/:collectibleId', async (req, res) => {
+  try {
+    const collectible = await Collectibles.getCollectibleById(
+      req.params.collectibleId
+    );
+    res.status(200).json(collectible);
+  } catch (error) {
+    res
+      .status(500)
+      .json({ message: 'Server error fetching collectible data', error });
+  }
 });
 
 module.exports = router;

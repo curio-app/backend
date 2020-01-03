@@ -3,6 +3,7 @@ const bcrypt = require('bcryptjs');
 
 const { generateToken } = require('./utils.js');
 const Users = require('./controller.js');
+const Folders = require('../folders/controller.js');
 
 router.post('/register', async (req, res) => {
   const { email, password, imageUrl, username } = req.body;
@@ -27,6 +28,7 @@ router.post('/register', async (req, res) => {
     if (user.error !== undefined) {
       return res.status(400).json(user);
     }
+    await Folders.addFolder({ userId: user.id, name: 'All' });
     const token = generateToken(user);
     return res.status(201).json({
       message: 'User successfully created!',

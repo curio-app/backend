@@ -19,8 +19,7 @@ const getFullUserProfile = async username => {
         'collectibles.id'
       )
       .select('collectibles.id', 'collectibles.name', 'collectibles.imageUrl')
-      .orderBy('collectibles.createdAt', 'desc')
-      .limit(5);
+      .orderBy('collectibles.createdAt', 'desc');
     return {
       folderId: folder.id,
       folder: folder.name,

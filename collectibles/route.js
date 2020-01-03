@@ -2,6 +2,7 @@ const router = require('express').Router();
 
 const { authenticate } = require('../auth/utils.js');
 const Collectibles = require('./controller.js');
+const Tags = require('../tags/controller.js');
 const Folders = require('../folders/controller.js');
 
 router.get('/', async (req, res) => {
@@ -45,6 +46,9 @@ router.post('/:userId', authenticate, async (req, res) => {
         },
         allFolder.id
       );
+      if (req.body.tags.length > 0) {
+        req.body.tags.forEach(tag => Tags.addTagToCollectible(tag));
+      }
       return res.status(201).json(collectible);
     } catch (error) {
       console.log(error);

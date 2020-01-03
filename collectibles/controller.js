@@ -93,8 +93,9 @@ const getCollectibleById = async id => {
       'collectibles.description',
       'collectibles.story',
       'collectibles.sellable',
+      'collectibles.imageUrl',
       'users.username',
-      'users.imageUrl',
+      'users.imageUrl as userImageUrl',
       'users.id as userId'
     )
     .first();

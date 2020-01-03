@@ -61,7 +61,7 @@ const getCollectiblesInFolder = folder_Id => {
 
 const removeCollectibleFromFolder = (collectible_Id, folder_Id) => {
   return db('foldersCollectibles')
-    .where({ collectibleId: collectible_Id }, { folderId: folder_Id })
+    .where({ collectibleId: collectible_Id, folderId: folder_Id })
     .del()
     .then(result => getCollectiblesInFolder(folder_Id));
 };

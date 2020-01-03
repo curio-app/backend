@@ -3,21 +3,21 @@ const db = require('../config/db.js');
 const getUserByEmail = email => {
   return db('users')
     .where({ email })
-    .select('id', 'username', 'role', 'email')
+    .select('id', 'username', 'role', 'email', 'imageUrl')
     .first();
 };
 
 const getUserById = id => {
   return db('users')
     .where({ id })
-    .select('id', 'username', 'role', 'email')
+    .select('id', 'username', 'role', 'email', 'imageUrl')
     .first();
 };
 
 const getUserByUserName = username => {
   return db('users')
     .where({ username })
-    .select('id', 'username', 'role', 'email', 'password')
+    .select('id', 'username', 'role', 'email', 'password', 'imageUrl')
     .first();
 };
 

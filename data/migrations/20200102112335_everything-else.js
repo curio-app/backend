@@ -64,7 +64,10 @@ exports.up = function(knex) {
     })
     .createTable('tags', table => {
       table.increments();
-      table.string('name', 128).notNullable();
+      table
+        .string('name', 128)
+        .notNullable()
+        .unique();
     })
     .createTable('collectibleTags', table => {
       table.increments();

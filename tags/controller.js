@@ -10,6 +10,12 @@ const getTagById = id => {
     .first();
 };
 
+const getTagByName = name => {
+  return db('tags')
+    .where({ name })
+    .first();
+};
+
 const addTag = async tag => {
   try {
     const [id] = await db('tags')
@@ -47,6 +53,7 @@ const removeTagFromCollectible = (collectible_Id, tag_Id) => {
 module.exports = {
   getTagsByCollectibleId,
   getTags,
+  getTagByName,
   getTagById,
   addTag,
   removeTagFromCollectible,

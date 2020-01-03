@@ -98,13 +98,17 @@ router.get('/collectibles/:folderId', (req, res) => {
     });
 });
 
-router.delete('/:folderId', (req, res) => {
+router.delete('/collectibles/:folderId', (req, res) => {
   const { folderId } = req.params;
   const { collectibleId } = req.body;
 
   Folders.removeCollectibleFromFolder(collectibleId, folderId)
     .then(removed => {
-      res.status(200).json(removed);
+      res
+        .status(200)
+        .json(
+          `Successfully removed collectible ${collectibleId} from folder ${folderId}`
+        );
     })
     .catch(error => {
       console.log(error);

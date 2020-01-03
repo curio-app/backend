@@ -101,37 +101,47 @@ router.post('/', (req, res) => {
 });
 
 router.post('/:collectibleId', validateCollectibleId, async (req, res) => {
-  const { collectibleId } = req.params;
-  const tagName = req.body.name;
-  let exists = false;
+  try {
+    const { collectibleId } = req.params;
+    const tagName = req.body.name;
+    let exists = false;
 
-  const tags = await Tags.getTagsByCollectibleId(collectibleId);
-  const findTag = await Tags.getTagByName(tagName);
-  const newTag = await Tags.addTag({ name: tagName });
+    const tags = await Tags.getTagsByCollectibleId(collectibleId);
+    const findTag = await Tags.getTagByName(tagName);
+    const newTag = await Tags.addTag({ name: tagName });
 
-  tags.forEach(tag => {
-    if (tag.id === findTag.id) {
-      exists = true;
-    }
-  });
+    console.log(tags);
 
-  if (exists) {
-    return res
-      .status(400)
-      .json({ message: 'That tag is already associated to the collectible' });
-  }
-
-  Tags.addTagToCollectible(collectibleId, newTag.id || findTag.id)
-    .then(added => {
-      res.status(201).json(added);
-    })
-    .catch(error => {
-      console.log(error);
-      res.status(500).json({
-        message: 'Sever error adding tag to collectible',
-        error,
+    if (findTag) {
+      tags.forEach(tag => {
+        if (findTag.id) {
+          if (tag.id === findTag.id) {
+            exists = true;
+          }
+        }
       });
+    }
+
+    if (exists) {
+      return res
+        .status(400)
+        .json({ message: 'That tag is already associated to the collectible' });
+    }
+
+    const added = await Tags.addTagToCollectible(
+      collectibleId,
+      newTag.id || findTag.id
+    );
+
+    console.log(tags);
+    res.status(201).json(added);
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({
+      message: 'Server error adding tag to collectible',
+      error,
     });
+  }
 });
 
 module.exports = router;

@@ -46,8 +46,12 @@ router.post('/:userId', authenticate, async (req, res) => {
         },
         allFolder.id
       );
+
       if (req.body.tags.length > 0) {
-        req.body.tags.forEach(tag => Tags.addTagToCollectible(tag));
+        req.body.tags.forEach(tag => {
+          console.log(tag, 'tag');
+          Tags.addTagToCollectible(collectible.id, tag.id);
+        });
       }
       return res.status(201).json(collectible);
     } catch (error) {

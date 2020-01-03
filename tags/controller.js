@@ -27,6 +27,13 @@ const addTag = async tag => {
   }
 };
 
+const getTagsByCollectibleId = id => {
+  return db('collectibleTags')
+    .where({ 'collectibleTags.collectibleId': id })
+    .join('tags', 'collectibleTags.tagId', 'tags.id')
+    .select('tags.id', 'tags.name');
+};
+
 const addTagToCollectible = (collectible_Id, tag_Id) => {
   const newTag = { collectibleId: collectible_Id, tagId: tag_Id };
 
@@ -34,13 +41,6 @@ const addTagToCollectible = (collectible_Id, tag_Id) => {
     .insert(newTag)
     .returning('id')
     .then(result => getTagsByCollectibleId(collectible_Id));
-};
-
-const getTagsByCollectibleId = id => {
-  return db('collectibleTags')
-    .where({ 'collectibleTags.collectibleId': id })
-    .join('tags', 'collectibleTags.tagId', 'tags.id')
-    .select('tags.id', 'tags.name');
 };
 
 const removeTagFromCollectible = (collectible_Id, tag_Id) => {

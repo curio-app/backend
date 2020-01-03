@@ -16,6 +16,10 @@ exports.up = knex => {
       .dateTime('updatedAt')
       .notNullable()
       .defaultTo(knex.fn.now());
+    table
+      .string('username')
+      .notNullable()
+      .unique();
   });
 };
 

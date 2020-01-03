@@ -4,7 +4,7 @@ const getLikesByCollectibleId = id => {
   return db('likes')
     .where({ 'likes.collectibleId': id })
     .join('users', 'likes.userId', 'users.id')
-    .select('users.id', 'users.email');
+    .select('users.id', 'users.username');
 };
 
 module.exports = { getLikesByCollectibleId };

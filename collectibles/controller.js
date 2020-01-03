@@ -23,7 +23,7 @@ const getAllCollectibles = async () => {
       'collectibles.description',
       'collectibles.sellable',
       'folders.id as folderId',
-      'users.email',
+      'users.username',
       'users.id as userId'
     );
   const full = collectibles.map(async coll => {

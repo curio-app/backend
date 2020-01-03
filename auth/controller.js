@@ -12,6 +12,12 @@ const getUserById = id => {
     .first();
 };
 
+const getUserByUserName = username => {
+  return db('users')
+    .where({ username })
+    .first();
+};
+
 const newUser = async user => {
   try {
     const [id] = await db('users')
@@ -29,4 +35,9 @@ const newUser = async user => {
   }
 };
 
-module.exports = { getUserByEmail, getUserById, newUser };
+module.exports = {
+  getUserByEmail,
+  getUserById,
+  newUser,
+  getUserByUserName,
+};

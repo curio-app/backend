@@ -1,4 +1,4 @@
-const LoremIpsum = require('lorem-ipsum').LoremIpsum;
+const { LoremIpsum } = require('lorem-ipsum');
 
 const lorem = new LoremIpsum({
   sentencesPerParagraph: {
@@ -11,10 +11,10 @@ const lorem = new LoremIpsum({
   },
 });
 
-exports.seed = function(knex) {
+exports.seed = knex => {
   const collectibles = [];
 
-  for (let i = 0; i <= 50; i++) {
+  for (let i = 0; i <= 50; i += 1) {
     const newObj = {
       name: lorem.generateWords(3),
       description: lorem.generateParagraphs(1),

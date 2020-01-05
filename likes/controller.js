@@ -7,17 +7,16 @@ const getLikesByCollectibleId = id => {
     .select('users.id', 'users.username');
 };
 
-const addLike = (collectibleId, userId) => {
-  return db('likes')
-    .insert({ collectibleId: collectibleId, userId: userId })
-    .then(result => getLikesByCollectibleId(collectibleId));
+const addLike = async (collectibleId, userId) => {
+  await db('likes').insert({ collectibleId, userId });
+  return getLikesByCollectibleId(collectibleId);
 };
 
-const removeLike = (collectibleId, userId) => {
-  return db('likes')
+const removeLike = async (collectibleId, userId) => {
+  await db('likes')
     .where({ userId, collectibleId })
-    .del()
-    .then(result => getLikesByCollectibleId(collectibleId));
+    .del();
+  return getLikesByCollectibleId(collectibleId);
 };
 
 module.exports = { getLikesByCollectibleId, addLike, removeLike };

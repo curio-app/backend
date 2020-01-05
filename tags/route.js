@@ -4,81 +4,82 @@ const Tags = require('./controller.js');
 const Collectibles = require('../collectibles/controller.js');
 
 // middleware
-const validateCollectibleId = (req, res, next) => {
-  let id = req.params.id || req.params.collectibleId;
+const validateCollectibleId = async (req, res, next) => {
+  const id = req.params.id || req.params.collectibleId;
+  try {
+    const collectible = await Collectibles.getCollectibleById(id);
 
-  console.log(id);
-
-  Collectibles.getCollectibleById(id)
-    .then(collectible => {
-      console.log(collectible);
-      if (collectible) {
-        req.collectible = collectible;
-        next();
-      } else {
-        res.status(400).json({ message: 'Invalid collectibleId' });
-      }
-    })
-    .catch(err => {
-      console.log(err);
-      res.status(500).json({ message: 'Error validating collectible', err });
-    });
+    if (collectible) {
+      req.collectible = collectible;
+      next();
+    } else {
+      return res.status(400).json({ message: 'Invalid collectibleId' });
+    }
+    return null;
+  } catch (error) {
+    console.log(error);
+    return res
+      .status(500)
+      .json({ message: 'Error validating collectible', error });
+  }
 };
 
 // CRUD
 
-router.get('/', (req, res) => {
-  Tags.getTags()
-    .then(tags => res.status(200).json(tags))
-    .catch(err => {
-      console.log(err);
-      res.status(500).json({ error: err });
-    });
+router.get('/', async (req, res) => {
+  try {
+    const tags = await Tags.getTags();
+    return res.status(200).json(tags);
+  } catch (error) {
+    console.log(error);
+    return res.status(500).json({ error });
+  }
 });
 
-router.get('/name/:tagName', (req, res) => {
+router.get('/name/:tagName', async (req, res) => {
   const { tagName } = req.params;
-  Tags.getTagByName(tagName)
-    .then(tag => res.status(200).json(tag))
-    .catch(err => {
-      console.log(err);
-      res.status(500).json({ error: err });
-    });
+  try {
+    const tag = await Tags.getTagByName(tagName);
+    return res.status(200).json(tag);
+  } catch (error) {
+    console.log(error);
+    return res.status(500).json({ error });
+  }
 });
 
-router.get('/:collectibleId', validateCollectibleId, (req, res) => {
+router.get('/:collectibleId', validateCollectibleId, async (req, res) => {
   const { collectibleId } = req.params;
-  Tags.getTagsByCollectibleId(collectibleId)
-    .then(tags => res.status(200).json(tags))
-    .catch(err => {
-      console.log(err);
-      res.status(500).json({
-        message: 'Server error getting tags by collectibleId',
-        error: err,
-      });
+  try {
+    const tags = await Tags.getTagsByCollectibleId(collectibleId);
+    return res.status(200).json(tags);
+  } catch (error) {
+    console.log(error);
+    return res.status(500).json({
+      message: 'Server error getting tags by collectibleId',
+      error,
     });
+  }
 });
 
-router.delete('/:collectibleId', validateCollectibleId, (req, res) => {
+router.delete('/:collectibleId', validateCollectibleId, async (req, res) => {
   const { collectibleId } = req.params;
   const { tagId } = req.body;
-  Tags.removeTagFromCollectible(collectibleId, tagId)
-    .then(remaining => {
-      res.status(200).json({
-        message: `Successfully removed tag ${tagId} from collectible ${collectibleId}`,
-        remaining,
-      });
-    })
-    .catch(error => {
-      console.log(error);
-      res.status(500).json({
-        message: 'Server error removing tag from collectible',
-        error,
-      });
+  try {
+    const remaining = await Tags.removeTagFromCollectible(collectibleId, tagId);
+    return res.status(200).json({
+      message: `Successfully removed tag ${tagId} from collectible ${collectibleId}`,
+      remaining,
     });
+  } catch (error) {
+    console.log(error);
+    return res.status(500).json({
+      message: 'Server error removing tag from collectible',
+      error,
+    });
+  }
 });
 
-router.post('/', (req, res) => {
+router.post('/', async (req, res) => {
   const { name } = req.body;
 
   if (!name) {
@@ -87,17 +88,16 @@ router.post('/', (req, res) => {
       .json({ message: 'name is required to create a tag' });
   }
 
-  Tags.addTag(req.body)
-    .then(added => {
-      res.status(201).json(added);
-    })
-    .catch(error => {
-      console.log(error);
-      res.status(500).json({
-        message: 'Server error adding tag',
-        error,
-      });
+  try {
+    const added = await Tags.addTag(req.body);
+    return res.status(201).json(added);
+  } catch (error) {
+    console.log(error);
+    return res.status(500).json({
+      message: 'Server error adding tag',
+      error,
     });
+  }
 });
 
 router.post('/:collectibleId', validateCollectibleId, async (req, res) => {
@@ -105,33 +105,35 @@ router.post('/:collectibleId', validateCollectibleId, async (req, res) => {
   const tagName = req.body.name;
   let exists = false;
 
-  const tags = await Tags.getTagsByCollectibleId(collectibleId);
-  const findTag = await Tags.getTagByName(tagName);
-  const newTag = await Tags.addTag({ name: tagName });
+  try {
+    const tags = await Tags.getTagsByCollectibleId(collectibleId);
+    const findTag = await Tags.getTagByName(tagName);
+    const newTag = await Tags.addTag({ name: tagName });
 
-  tags.forEach(tag => {
-    if (tag.id === findTag.id) {
-      exists = true;
-    }
-  });
-
-  if (exists) {
-    return res
-      .status(400)
-      .json({ message: 'That tag is already associated to the collectible' });
-  }
-
-  Tags.addTagToCollectible(collectibleId, newTag.id || findTag.id)
-    .then(added => {
-      res.status(201).json(added);
-    })
-    .catch(error => {
-      console.log(error);
-      res.status(500).json({
-        message: 'Sever error adding tag to collectible',
-        error,
-      });
+    tags.forEach(tag => {
+      if (tag.id === findTag.id) {
+        exists = true;
+      }
     });
+
+    if (exists) {
+      return res
+        .status(400)
+        .json({ message: 'That tag is already associated to the collectible' });
+    }
+
+    const added = Tags.addTagToCollectible(
+      collectibleId,
+      newTag.id || findTag.id
+    );
+    return res.status(201).json(added);
+  } catch (error) {
+    console.log(error);
+    return res.status(500).json({
+      message: 'Sever error adding tag to collectible',
+      error,
+    });
+  }
 });
 
 module.exports = router;

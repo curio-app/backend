@@ -22,18 +22,9 @@ const addTag = async tag => {
       .returning('id')
       .insert(tag);
     return getTagById(id);
-  } catch (err) {
-    return { error: err };
+  } catch (error) {
+    return { error };
   }
-};
-
-const addTagToCollectible = (collectible_Id, tag_Id) => {
-  const newTag = { collectibleId: collectible_Id, tagId: tag_Id };
-
-  return db('collectibleTags')
-    .insert(newTag)
-    .returning('id')
-    .then(result => getTagsByCollectibleId(collectible_Id));
 };
 
 const getTagsByCollectibleId = id => {
@@ -43,11 +34,21 @@ const getTagsByCollectibleId = id => {
     .select('tags.id', 'tags.name');
 };
 
-const removeTagFromCollectible = (collectible_Id, tag_Id) => {
-  return db('collectibleTags')
-    .where({ collectibleId: collectible_Id, tagId: tag_Id })
-    .del()
-    .then(result => getTagsByCollectibleId(collectible_Id));
+const addTagToCollectible = async (collectibleId, tagId) => {
+  const newTag = { collectibleId, tagId };
+
+  await db('collectibleTags')
+    .insert(newTag)
+    .returning('id');
+
+  return getTagsByCollectibleId(collectibleId);
+};
+
+const removeTagFromCollectible = async (collectibleId, tagId) => {
+  await db('collectibleTags')
+    .where({ collectibleId, tagId })
+    .del();
+  return getTagsByCollectibleId(collectibleId);
 };
 
 module.exports = {

@@ -33,13 +33,11 @@ const getFullUserProfile = async username => {
   };
 };
 
-const updateProfile = (username, updated) => {
-  return db('users')
+const updateProfile = async (username, updated) => {
+  await db('users')
     .update(updated)
-    .where({ username })
-    .then(updatedUser => {
-      return getFullUserProfile(username);
-    });
+    .where({ username });
+  return getFullUserProfile(username);
 };
 
 module.exports = {

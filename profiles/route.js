@@ -12,16 +12,16 @@ router.get('/:username', async (req, res) => {
   }
 });
 
-router.put('/:username', (req, res) => {
+router.put('/:username', async (req, res) => {
   const { username } = req.params;
   const changes = req.body;
-
-  Profiles.updateProfile(username, changes)
-    .then(profile => res.status(200).json(profile))
-    .catch(err => {
-      console.log(err);
-      res.status(500).json({ error: err });
-    });
+  try {
+    const profile = await Profiles.updateProfile(username, changes);
+    return res.status(200).json(profile);
+  } catch (error) {
+    console.log(error);
+    return res.status(500).json({ error });
+  }
 });
 
 module.exports = router;

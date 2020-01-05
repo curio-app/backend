@@ -20,50 +20,40 @@ const addFolder = async folder => {
       .returning('id')
       .insert(folder);
     return getFolderById(id);
-  } catch (err) {
-    return { error: err };
+  } catch (error) {
+    return { error };
   }
 };
 
 const updateFolder = (id, updated) => {
   return db('folders')
-    .update(updated)
     .where({ id })
-    .then(updatedFolder => {
-      return getFolderById(id);
-    });
+    .update(updated);
 };
 
 const deleteFolder = id => {
   return db('folders')
     .where({ id })
-    .del()
-    .then(result => result);
+    .del();
 };
 
-const addCollectibleToFolder = (collectible_Id, folder_Id) => {
-  const newCollectible = { collectibleId: collectible_Id, folderId: folder_Id };
-
-  return db('foldersCollectibles')
+const addCollectibleToFolder = async (collectibleId, folderId) => {
+  const newCollectible = { collectibleId, folderId };
+  await db('foldersCollectibles')
     .insert(newCollectible)
-    .returning('id')
-    .then(
-      result =>
-        `Successfully added collectible ${collectible_Id} to folder ${folder_Id}`
-    );
+    .returning('id');
+  return `Successfully added collectible ${collectibleId} to folder ${folderId}`;
 };
 
-const getCollectiblesInFolder = folder_Id => {
-  return db('foldersCollectibles')
-    .where({ folderId: folder_Id })
-    .then(result => result);
+const getCollectiblesInFolder = folderId => {
+  return db('foldersCollectibles').where({ folderId });
 };
 
-const removeCollectibleFromFolder = (collectible_Id, folder_Id) => {
-  return db('foldersCollectibles')
-    .where({ collectibleId: collectible_Id, folderId: folder_Id })
-    .del()
-    .then(result => getCollectiblesInFolder(folder_Id));
+const removeCollectibleFromFolder = async (collectibleId, folderId) => {
+  await db('foldersCollectibles')
+    .where({ collectibleId, folderId })
+    .del();
+  return getCollectiblesInFolder(folderId);
 };
 
 const getFolderByNameAndUserId = (name, userId) => {

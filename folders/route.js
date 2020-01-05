@@ -4,7 +4,7 @@ const Folders = require('./controller.js');
 
 // middleware
 const validateFolderId = (req, res, next) => {
-  let id = req.params.id || req.params.folderId;
+  const id = req.params.id || req.params.folderId;
 
   Folders.getFolderById(id)
     .then(folder => {
@@ -20,7 +20,7 @@ const validateFolderId = (req, res, next) => {
 
 // CRUD
 
-router.post('/', (req, res) => {
+router.post('/', async (req, res) => {
   const { userId, name } = req.body;
 
   if (!userId) {
@@ -31,109 +31,126 @@ router.post('/', (req, res) => {
   if (!name) {
     return res.status(400).json({ message: 'folderName is required' });
   }
-
-  Folders.addFolder(req.body)
-    .then(folder => {
-      res.status(201).json(folder);
-    })
-    .catch(error => {
-      console.log(error);
-      res
-        .status(500)
-        .json({ message: 'Server error creating new folder', error });
-    });
+  try {
+    const folder = await Folders.addFolder(req.body);
+    return res.status(201).json(folder);
+  } catch (error) {
+    console.log(error);
+    return res
+      .status(500)
+      .json({ message: 'Server error creating new folder', error });
+  }
 });
 
-router.get('/', (req, res) => {
-  Folders.getAllFolders()
-    .then(folders => res.status(200).json(folders))
-    .catch(err => res.status(500).json({ error: err }));
+router.get('/', async (req, res) => {
+  try {
+    const folders = await Folders.getAllFolders();
+    return res.status(200).json(folders);
+  } catch (error) {
+    console.log(error);
+    return res.status(500).json({ error });
+  }
 });
 
-router.get('/:id', validateFolderId, (req, res) => {
+router.get('/:id', validateFolderId, async (req, res) => {
   const { id } = req.params;
-  Folders.getFolderById(id)
-    .then(folder => res.status(200).json(folder))
-    .catch(err => res.status(500).json({ error: err }));
+  try {
+    const folder = await Folders.getFolderById(id);
+    return res.status(200).json(folder);
+  } catch (error) {
+    console.log(error);
+    return res.status(500).json({ error });
+  }
 });
 
-router.get('/user/:userId', (req, res) => {
+router.get('/user/:userId', async (req, res) => {
   const { userId } = req.params;
-  Folders.getFoldersByUserId(userId)
-    .then(folder => res.status(200).json(folder))
-    .catch(err => res.status(500).json({ error: err }));
+  try {
+    const folder = await Folders.getFoldersByUserId(userId);
+    return res.status(200).json(folder);
+  } catch (error) {
+    console.log(error);
+    return res.status(500).json({ error });
+  }
 });
 
-router.put('/:id', validateFolderId, (req, res) => {
+router.put('/:id', validateFolderId, async (req, res) => {
   const { id } = req.params;
   const changes = req.body;
-
-  Folders.updateFolder(id, changes)
-    .then(folder => res.status(200).json(folder))
-    .catch(err => res.status(500).json({ error: err }));
+  try {
+    const folder = await Folders.updateFolder(id, changes);
+    return res.status(200).json(folder);
+  } catch (error) {
+    console.log(error);
+    return res.status(500).json({ error });
+  }
 });
 
-router.delete('/:id', validateFolderId, (req, res) => {
+router.delete('/:id', validateFolderId, async (req, res) => {
   const { id } = req.params;
-
-  Folders.deleteFolder(id)
-    .then(deleted =>
-      res.status(200).json({ message: `Successfully deleted folder ${id}` })
-    )
-    .catch(err => res.status(500).json({ error: err }));
+  try {
+    const count = await Folders.deleteFolder(id);
+    let status = 200;
+    let message = 'Folder has been deleted';
+    if (count < 1) {
+      status = 404;
+      message = 'Folder not found';
+    }
+    return status(status).json({ message });
+  } catch (error) {
+    console.log(error);
+    return res.status(500).json({ error });
+  }
 });
 
-router.post('/:folderId', validateFolderId, (req, res) => {
+router.post('/:folderId', validateFolderId, async (req, res) => {
   const { folderId } = req.params;
   const { collectibleId } = req.body;
-
-  Folders.addCollectibleToFolder(collectibleId, folderId)
-    .then(added => {
-      res.status(201).json(added);
-    })
-    .catch(error => {
-      console.log(error);
-      res.status(500).json({
-        message: 'Server error adding collectible to folder',
-        error,
-      });
+  try {
+    const added = await Folders.addCollectibleToFolder(collectibleId, folderId);
+    return res.status(201).json(added);
+  } catch (error) {
+    console.log(error);
+    return res.status(500).json({
+      message: 'Server error adding collectible to folder',
+      error,
     });
+  }
 });
 
-router.get('/collectibles/:folderId', validateFolderId, (req, res) => {
+router.get('/collectibles/:folderId', validateFolderId, async (req, res) => {
   const { folderId } = req.params;
-
-  Folders.getCollectiblesInFolder(folderId)
-    .then(collectibles => {
-      res.status(200).json(collectibles);
-    })
-    .catch(error => {
-      console.log(error);
-      res.status(500).json({
-        message: 'Server error getting collectibles from folder',
-        error,
-      });
+  try {
+    const collectibles = await Folders.getCollectiblesInFolder(folderId);
+    return res.status(200).json(collectibles);
+  } catch (error) {
+    console.log(error);
+    return res.status(500).json({
+      message: 'Server error getting collectibles from folder',
+      error,
     });
+  }
 });
 
-router.delete('/collectibles/:folderId', validateFolderId, (req, res) => {
+router.delete('/collectibles/:folderId', validateFolderId, async (req, res) => {
   const { folderId } = req.params;
   const { collectibleId } = req.body;
-
-  Folders.removeCollectibleFromFolder(collectibleId, folderId)
-    .then(remaining => {
-      res.status(200).json({
-        message: `Successfully removed collectible ${collectibleId} from folder ${folderId}.`,
-        remaining,
-      });
-    })
-    .catch(error => {
-      console.log(error);
-      res.status(500).json({
-        message: 'Server error removing collectible from folder',
-        error,
-      });
+  try {
+    const remaining = await Folders.removeCollectibleFromFolder(
+      collectibleId,
+      folderId
+    );
+    return res.status(200).json({
+      message: `Successfully removed collectible ${collectibleId} from folder ${folderId}.`,
+      remaining,
     });
+  } catch (error) {
+    console.log(error);
+    return res.status(500).json({
+      message: 'Server error removing collectible from folder',
+      error,
+    });
+  }
 });
 
 module.exports = router;

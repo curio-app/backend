@@ -87,4 +87,25 @@ router.get('/:collectibleId', async (req, res) => {
   }
 });
 
+router.delete('/:collectibleId', authenticate, async (req, res) => {
+  if (!req.admin) return res.status(401).json({ message: 'Unauthorized' });
+  try {
+    const count = await Collectibles.deleteCollectible(
+      req.params.collectibleId
+    );
+    let status = 200;
+    let message = 'Collectible has been deleted';
+    if (count < 1) {
+      status = 404;
+      message = 'Collectible not found';
+    }
+    return res.status(status).json({ message });
+  } catch (error) {
+    console.log(error);
+    return res
+      .status(500)
+      .json({ message: 'Server error while removing collectible' });
+  }
+});
+
 module.exports = router;

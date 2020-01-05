@@ -125,9 +125,25 @@ const addCollectible = async (collectible, folderId) => {
   }
 };
 
+const deleteCollectible = async collectibleId => {
+  await db('foldersCollectibles ')
+    .where({ collectibleId })
+    .del();
+  await db('likes')
+    .where({ collectibleId })
+    .del();
+  await db('collectibleTags')
+    .where({ collectibleId })
+    .del();
+  return db('collectibles')
+    .where({ id: collectibleId })
+    .del();
+};
+
 module.exports = {
   getAllCollectibles,
   getCollectibleById,
   addCollectible,
   getLatest,
+  deleteCollectible,
 };

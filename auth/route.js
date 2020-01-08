@@ -1,7 +1,7 @@
 const router = require('express').Router();
 const bcrypt = require('bcryptjs');
 
-const { generateToken } = require('./utils.js');
+const { generateToken, authenticate } = require('./utils.js');
 const Users = require('./controller.js');
 const Folders = require('../folders/controller.js');
 
@@ -66,6 +66,16 @@ router.post('/login', async (req, res) => {
     return res
       .status(500)
       .json({ message: 'Server error while logging in', error });
+  }
+});
+
+router.get('/get-user-info', authenticate, async (req, res) => {
+  try {
+    const user = await Users.getUserById(req.userId);
+    return res.status(200).json(user);
+  } catch (error) {
+    console.log(error);
+    return res.status(500).json({ message: 'Server error fetching user data' });
   }
 });
 

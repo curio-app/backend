@@ -47,7 +47,18 @@ router.post('/:userId', authenticate, async (req, res) => {
         allFolder.id
       );
       if (req.body.tags.length > 0) {
-        req.body.tags.forEach(tag => Tags.addTagToCollectible(tag));
+        await req.body.tags.reduce(async (acc, curTag) => {
+          await acc;
+          const tagExists = await Tags.getTagByName(curTag);
+          let tagId;
+          if (tagExists) {
+            tagId = tagExists.id;
+          } else {
+            const newTag = await Tags.addTag(curTag);
+            tagId = newTag.id;
+          }
+          return Tags.addTagToCollectible(collectible.id, tagId);
+        }, Promise.resolve);
       }
       return res.status(201).json(collectible);
     } catch (error) {
